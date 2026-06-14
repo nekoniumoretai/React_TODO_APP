@@ -28,6 +28,66 @@
   color: #61dafb;
 }
 
+.todo-item {
+  padding: 10px;
+  margin: 10px;
+  border: 1px solid lightgray;
+  border-radius: 8px;
+}
+
+.todo-date{
+  color: gray;
+  font-size: 0.8rem;
+}
+
+.completed {
+  text-decoration: line-through;
+  background-color: #bdbbbb;
+}
+
+button {
+  padding: 5px 15px;
+  margin: 4px;
+  cursor: pointer;
+  border: 1px solid rgb(83, 80, 80);
+  border-radius: 4px;
+}
+
+button:hover{
+  opacity: 0.5;
+}
+
+.edit-button{
+  background-color: rgb(159, 245, 182);
+  color: rgb(83, 80, 80);
+}
+
+.delete-button{
+  background-color: rgb(245, 159, 159);
+  color: rgb(83, 80, 80);
+}
+
+.complete-button{
+  background-color: rgb(230, 244, 144);
+  color: rgb(83, 80, 80);
+}
+
+.filter-button{
+  background-color: white;
+  color: black;
+}
+
+.sort-button{
+  background-color: white;
+  color: black;
+}
+
+.active-button{
+  background-color: rgb(159, 245, 182);
+  font-weight: bold;
+  border: 1px solid rgb(83, 80, 80);
+}
+
 @keyframes App-logo-spin {
   from {
     transform: rotate(0deg);
