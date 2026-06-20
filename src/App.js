@@ -307,6 +307,9 @@ function DisplayCount({filteredCount}){
 
 function App(){
   // const [count, setCount] = useState(0);
+  const [users, setUsers] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(false);
   const [text, setText] = useState("");
   const [editId, setEditId] = useState(null);
   const [filter, setFilter] = useState("all");
@@ -364,6 +367,35 @@ function App(){
       });
     }
 
+    // API
+    useEffect(() => {
+      fetch("https://jsonplaceholder.typicode.com/users")
+        .then((response) => {
+          if (!response.ok){ //API通信に失敗した時に.catchに飛ばす（fetchは404なども通信成功としてしまうため）
+            throw new Error("通信に失敗しました")
+          }
+          return response.json();
+        })
+
+        .then((data) => {
+          setUsers(data);
+          setLoading(false);
+        })
+
+        .catch((error) => {
+          console.error(error);
+          setError(true);
+          setLoading(false);
+        });
+    }, []);
+
+    // if (loading){
+    //   return <p>Loading...</p>
+    // }
+
+    // if (error){
+    //   return <p>通信に失敗しました。時間をおいて再度やり直して下さい。</p>
+    // }
 
   return (
     <div>
@@ -414,6 +446,21 @@ function App(){
       }}>
         完了済み削除
       </button>
+
+      {/* API通信表示 */}
+      { loading ? (
+        <p>Loading...</p>
+      ) : error ? (
+        <p>通信に失敗しました。時間をおいて再度やり直してください。</p>
+      ) : (
+        <ul>
+          {users.map((user) => (
+            <li key={user.id}>
+              {user.name}
+            </li>
+          ))}
+        </ul>
+      )}
     </div>
   );
 }
