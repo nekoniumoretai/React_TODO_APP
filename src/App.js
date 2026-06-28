@@ -75,9 +75,14 @@ function UsersList (){
 
   // APIで取得
   const fetchUsers = async() => {
+    // 成功でもエラーでもメッセージを正しく表示するために
+    // 取得開始時にフラグを更新してからAPI通信開始する
+    setLoading(true);
+    setError(false);
+
     try{
       const response = await fetch(
-        "https://jsonplaceholder.typicode.com/uses"
+        "https://jsonplaceholder.typicode.com/users"
       );
       if (!response.ok) {
         throw new Error("通信に失敗しました");
