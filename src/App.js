@@ -22,16 +22,6 @@ function Counter({ count, setCount}) {
   );
 }
 
-//ユーザー情報の表示
-function UserList({ users }){
-  return(
-    <ul>
-      {users.map((user, index) => (
-      <li key={index}>{user}</li>
-      ))}
-    </ul>
-  );
-}
 
 // フォーム
 // function InputForm ({text, setText, list, setList}){
@@ -78,22 +68,67 @@ function InputForm ({text, setText, list, setList}){
 }
 
 //ユーザーリスト
-function UserLists ({ list, setList }){
+function UsersList (){
+  const [users, setUsers] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(false);
+
+  // APIで取得
+  const fetchUsers = async() => {
+    try{
+      const response = await fetch(
+        "https://jsonplaceholder.typicode.com/uses"
+      );
+      if (!response.ok) {
+        throw new Error("通信に失敗しました");
+      }
+      const data = await response.json();
+      setUsers(data);
+    } catch (error) {
+      console.error(error);
+      setError(true);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchUsers();
+  }, []);
+
+
   return(
     <div>
-      <ul>
-        {list.map((item, index) => (
-          <li key={index}>
-            {item}
-            <button onClick={() => {
-              const newList = list.filter((_, i) => i !== index);
-              setList(newList);
-            }}>
-              削除
-            </button>
-          </li>
-        ))}
-      </ul>
+      {/* API再取得ボタン */}
+      <button onClick={fetchUsers}>
+        再取得
+      </button>
+
+      {/* API通信表示 */}
+      {/* シンプルにするならこの条件を復活させる */}
+      {/* if (loading){
+        return <p>Loading...</p>
+      }
+
+      if (error){
+        return <p>通信に失敗しました。時間をおいて再度やり直して下さい。</p>
+      } */}
+
+      { loading ? (
+        <p>Loading...</p>
+      ) : error ? (
+        <p>通信に失敗しました。時間をおいて再度やり直してください。</p>
+      ) : (
+        <ul>
+          {users.map((user) => (
+            <li key={user.id}>
+              <p>{user.name}</p>
+              <p>{user.username}</p>
+              <small>{user.email}</small>
+            </li>
+          ))}
+        </ul>
+      )}
     </div>
   )
 }
@@ -307,9 +342,6 @@ function DisplayCount({filteredCount}){
 
 function App(){
   // const [count, setCount] = useState(0);
-  const [users, setUsers] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(false);
   const [text, setText] = useState("");
   const [editId, setEditId] = useState(null);
   const [filter, setFilter] = useState("all");
@@ -326,7 +358,8 @@ function App(){
 
       return parsed.map(item => ({
         ...item,
-        createdAt: item.createdAt ? new Date(item.createdAt) : new Date()
+        createdAt: item.createdAt ? new Date(item.createdAt) : new Date(),
+        updatedAt: item.updatedAt ? new Date(item.updatedAt) : new Date()
       }));
     } catch (e){
       console.error("localStorage parse error", e);
@@ -367,42 +400,9 @@ function App(){
       });
     }
 
-    // API
-    useEffect(() => {
-      fetch("https://jsonplaceholder.typicode.com/users")
-        .then((response) => {
-          if (!response.ok){ //API通信に失敗した時に.catchに飛ばす（fetchは404なども通信成功としてしまうため）
-            throw new Error("通信に失敗しました")
-          }
-          return response.json();
-        })
-
-        .then((data) => {
-          setUsers(data);
-          setLoading(false);
-        })
-
-        .catch((error) => {
-          console.error(error);
-          setError(true);
-          setLoading(false);
-        });
-    }, []);
-
-    // if (loading){
-    //   return <p>Loading...</p>
-    // }
-
-    // if (error){
-    //   return <p>通信に失敗しました。時間をおいて再度やり直して下さい。</p>
-    // }
-
   return (
     <div>
-      {/* <Counter count={count} setCount={setCount}></Counter> */}
-      {/* <UserList users={users}></UserList> */}
       {/* <InputForm text={text} setText={setText} list={list} setList={setList}></InputForm> */}
-      {/* <UserLists list={list} setList={setList}></UserLists> */}
       <TodoInputForm text={text}
                 setText={setText} 
                 editId={editId}
@@ -447,20 +447,8 @@ function App(){
         完了済み削除
       </button>
 
-      {/* API通信表示 */}
-      { loading ? (
-        <p>Loading...</p>
-      ) : error ? (
-        <p>通信に失敗しました。時間をおいて再度やり直してください。</p>
-      ) : (
-        <ul>
-          {users.map((user) => (
-            <li key={user.id}>
-              {user.name}
-            </li>
-          ))}
-        </ul>
-      )}
+      <UsersList/>
+
     </div>
   );
 }
